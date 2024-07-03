@@ -84,30 +84,60 @@ function parseFormula(e) {
 }
 
 function toPolishNotation(inputFormula) {
-    const valPile = []
-    let carry = ""
+    const operatorStack = []
     let polishNotation = ""
 
-    const symbols = inputFormula.split(' ')
+    const tokens = inputFormula.split(' ')
 
-    for (let s = 0; s < symbols.length; s++) {
-        const symbol = symbols[s];
+    for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
 
-        switch (symbol) {
-            case "=":
-                carry = symbol
+        switch (token) {
+            case ")":
+                while (operatorStack.length > 0 && operatorStack[operatorStack.length - 1] !== "(") {
+                    const operator = operatorStack.pop()
+                    polishNotation += operator + " "
+                }
+                operatorStack.pop()
+                break;
+            case "(":
+            case "*":
+            case "/":
+                operatorStack.push(token)
+                break
+            case "+":
+            case "-":
+                while (operatorStack.length > 0 && (getOperatorPriority(operatorStack[operatorStack.length - 1]) >= getOperatorPriority(token))) {
+                    const topOperator = operatorStack.pop()
+                    polishNotation += topOperator + " "
+                }
+
+                operatorStack.push(token)
                 break
             default:
-                valPile.push(symbol)
-                if (valPile.length === getOperationArgLength(carry)) {
-                    const argLen = getOperationArgLength(symbol)
-                    polishNotation += [carry].concat(valPile.slice(-argLen)).join(" ")
-                }
-                break
+                polishNotation += token + " "
+                break;
         }
     }
 
+    while (operatorStack.length > 0) {
+        polishNotation += operatorStack.pop()
+    }
+
     return polishNotation
+}
+
+console.log(toPolishNotation("(a + b) * c * d"))
+
+function getOperatorPriority(operator) {
+    const oprMap = {
+        "*": 2,
+        "/": 2,
+        "+": 1,
+        "-": 1,
+    }
+
+    return oprMap[operator] === undefined ? 0 : oprMap[operator]
 }
 
 const inputFormula = document.getElementById('formula')
