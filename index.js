@@ -121,13 +121,17 @@ function toPolishNotation(inputFormula) {
     }
 
     while (operatorStack.length > 0) {
-        polishNotation += operatorStack.pop()
+        polishNotation += operatorStack.pop() + " "
     }
 
     return polishNotation
 }
 
-console.log(toPolishNotation("(a + b) * c * d"))
+console.log({
+    input: "(a + b + c) * d",
+    output: toPolishNotation("(a + b + c) * d"),
+    isRight: toPolishNotation("(a + b + c) * d") === "a b + c + d *"
+})
 
 function getOperatorPriority(operator) {
     const oprMap = {
